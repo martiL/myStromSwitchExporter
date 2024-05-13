@@ -2,10 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -52,7 +55,15 @@ func init() {
 }
 
 func fetchMetrics() {
-	resp, err := http.Get("http://<your-device-ip>/report")
+	err := godotenv.Load() // Loads the .env file that is in the same directory as the code
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+	ip := os.Getenv("IP_WIFI_SWITCH")
+	url := fmt.Sprintf("http://%s/report", ip)
+
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Printf("Error fetching metrics: %v", err)
 		return
